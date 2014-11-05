@@ -1,0 +1,7 @@
+# Jake Zwart, 2012-12-20 
+# moving average filter with no offset (it does however cut off either end of data by n/2) 
+# n is the number of data points in front of and behind given data point
+
+ma <- function(x,n=5,sides=2){as.numeric(filter(x,rep(1/n,n), sides=sides))}
+
+
