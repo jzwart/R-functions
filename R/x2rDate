@@ -1,0 +1,13 @@
+#Jake Zwart, 2012-12-06
+# This function converts excel date time numeric format to R date format. The excel date time 
+# is days since 1900-01-01, but there's some screwy thing about leap years so the origin is actually
+# 1899-12-30. First, the days since this date must be converted to seconds since this date, since
+# this is how R reads numeric date time. After converting to seconds, 1 hour is subtracted because 
+# the date time was off by one hour and then it is rounded to the nearest integer because R wasn't  
+# working well with integers. 
+
+x2rDate<-function(dateTime){
+  dateTime <- round((dateTime*24*3600)-3600)
+  dateTime <- format(as.POSIXct(dateTime, origin="1899-12-30"), "%Y-%m-%d %H:%M")
+  return(dateTime)
+}
