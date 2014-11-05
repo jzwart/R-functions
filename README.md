@@ -1,4 +1,4 @@
 R-functions
 ===========
 
-Repository for various R functions that I use
+Repo of various R functions that I use
