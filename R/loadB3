@@ -1,0 +1,31 @@
+# Jake Zwart, 2013-01-08 
+# This function is used to format files correctly before loading into B3 (QA/QC program) 
+# The function prompts the user to locate date column and time column and input the format of each - format
+# must use standard POSIX characters - so user must be familiar with these or just type help(strptime) in 
+# the console to find the list 
+
+#####################################################################
+loadB3<-function(x){
+{dateCol<-as.numeric(readline("In which column is the date? "));  #stores user prompt of date column location
+ timeCol<-as.numeric(readline("In which column is the time? "));  #stores user prompt of time column location
+ dateForm<-readline("What is the date format? (i.e. %Y-%m-%d) "); #stores user prompt of date format 
+ timeForm<-readline("What is the time format? (i.e. %H:%M:%S) ")  #stores user prompt of time format
+ outName<-readline("Name of file to write: ")}  
+
+format<-paste(dateForm,timeForm) #creating a single dateTime format 
+
+if (dateCol!=timeCol){                     #checks to see if date and time are NOT in the same column 
+  dateTime<-paste(x[,dateCol],x[,timeCol]) #If not, then paste two columns together to create dateTime vector
+  x<-subset(x,select=-c(dateCol,timeCol))  #get rid of previous date and time columns 
+  }else {                                  #If date and time are in the same column...
+    dateTime<-x[,dateCol]                  #dateTime vector is the date (or time) column 
+    x<-subset(x,select=-dateCol)           #get rid of previous dateTime column 
+}
+
+dateTime<-strftime(strptime(dateTime, format),"%Y-%m-%d %H:%M") #format dateTime per B3 specifications 
+x<-cbind(dateTime,x)                                            #add new dateTime column to beginning of matrix 
+
+colnames(x)<-c("YYYY-MM-DD hh:mm",colnames(x[2:length(x)]))  #give dateTime column header per B3 requirements and keep rest of headers the same 
+write.csv(x,paste(outName,"B3input.csv"),row.names=F,quote=F)    #write B3 input file to working directory
+}
+##########################################################################
