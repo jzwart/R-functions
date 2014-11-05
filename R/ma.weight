@@ -1,0 +1,27 @@
+# JAZ; 2014-11-04; Trying out some code to do a weighted moving average by the uncertainty 
+# in metabolism estimates from a bootstrapping proceedure. Thinking about using coefficient of 
+# variation as the uncertainty, fitting moving average window weight by 
+
+# moving average filter with no offset (it does however cut off either end of data by n/2) 
+# n is the number of data points in front of and behind given data point; x = time series data; 
+# cv = coefficient of variation for each data point
+
+
+ma.weighted<-function(x,cv,n=5){
+  # x is the time series data mean or estimate; 
+  # cv is the coefficient of variation of the time series data; 
+  # n is the moving average window 
+  out<-rep(NA,length(x))
+  for(i in 1:length(x)){
+    # check to see if it's at the beginning or end of data frame
+    halfN<-round(n/2)
+    if(halfN>=i|halfN>(length(x)-i)){
+      next
+    }else{
+      weights<-(1/(cv[(i-halfN):(i+halfN)]))/sum(1/(cv[(i-halfN):(i+halfN)])) #find cv of current ma window 
+      curX<-x[(i-halfN):(i+halfN)] # raw data of current ma window 
+      out[i]<-sum(weights*curX) # output of weight ma 
+    }
+  }
+  return(out)
+}
