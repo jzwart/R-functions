@@ -34,3 +34,51 @@ lightProfileCalc<-function(I0,z,kD=NULL,DOC=NULL,chloro=NULL,zmix=NULL){
 	
 	return(list(Iz=Iz,Ibar=Ibar))
 }
+
+
+require(LakeMetabolizer) 
+# time series wrapper for light profile calculation; JAZ 2015-01-16 
+ts.lightProfileCalc<-function(ts.data){
+  data<-ts.data
+  
+  if(has.vars(data,'I0')){
+    I0=get.vars(data,'I0')
+  }else{
+    stop('Data must have I0 column\n')
+  }
+  
+  if(has.vars(data,'z')){
+    z=get.vars(data,'z')
+  }else{
+    stop('Data must have z column\n')
+  }
+  
+  if(has.vars(data,'zmix')){
+    zmix=get.vars(data,'zmix')
+  }else{
+    stop('Data must have zmix column\n')
+  }
+  
+  if(has.vars(data,'kD')){
+    kD=get.vars(data,'kD')
+  }else if(has.vars(data,'DOC')){
+    DOC=get.vars(data,'DOC')
+    chloro=get.vars(data,'chloro')
+  }else{
+    stop('Data must have kD or DOC and chloro column\n')
+  }
+  
+  if(has.vars(data,'kD')){
+    lightProf<-unlist(Map(f=lightProfileCalc,I0=I0[,2],z=z[,2],kD=kD[,2],zmix=zmix[,2]))
+    lightClimate<-as.numeric(lightProf[names(lightProf)=='Ibar'])
+    light_z<-as.numeric(lightProf[names(lightProf)=='Iz'])
+  }else if(has.vars(data,'DOC')){
+    lightProf<-unlist(Map(f=lightProfileCalc,I0=I0[,2],z=z[,2],DOC=DOC[,2],chloro=chloro[,2],zmix=zmix[,2]))
+    lightClimate<-as.numeric(lightProf[names(lightProf)=='Ibar'])
+    light_z<-as.numeric(lightProf[names(lightProf)=='Iz'])
+  }
+  
+  return(data.frame(datetime=data$datetime,lightClimate=lightClimate,light_z=light_z))
+  
+}
+
